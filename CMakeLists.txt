@@ -24,11 +24,9 @@ set(GLM_DIR glm-0.9.9.3)
 set(GLAD_DIR glad)
 set(JSON_DIR json-3.5.0)
 set(STB_DIR stb)
-set(ASSIMP_DIR assimp-4.1.0)
 set(TINYGLTF_DIR tiny_gltf)
 
 add_subdirectory(third-party/${GLFW_DIR})
-add_subdirectory(third-party/${ASSIMP_DIR})
 
 find_package(OpenGL REQUIRED)
 
@@ -75,8 +73,6 @@ target_include_directories(
     third-party/${JSON_DIR}
     third-party/${IMGUI_DIR}
     third-party/${IMGUI_DIR}/examples/
-    third-party/${ASSIMP_DIR}/include
-    ${CMAKE_BINARY_DIR}/third-party/${ASSIMP_DIR}/include
     third-party/${STB_DIR}
     third-party/${TINYGLTF_DIR}
     lib/include
@@ -125,7 +121,6 @@ set(
     ${OPENGL_LIBRARIES}
     glfw
     glmlv
-    assimp
 )
 
 if(CMAKE_COMPILER_IS_GNUCXX AND NOT GLMLV_USE_BOOST_FILESYSTEM)
