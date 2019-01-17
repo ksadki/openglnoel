@@ -4,6 +4,7 @@
 #include <glmlv/GLProgram.hpp>
 #include <glmlv/ViewController.hpp>
 #include <glmlv/simple_geometry.hpp>
+#include <glmlv/Image2DRGBA.hpp>
 #include <iostream>
 
 using namespace std;
@@ -28,16 +29,26 @@ private:
   const std::string m_ImGuiIniFilename;
   const glmlv::fs::path m_ShadersRootPath;
 
+  glmlv::ViewController viewController;
+
   glmlv::SimpleGeometry cube;
   GLuint c_vbo,c_vao,c_ibo;
  
   glmlv::SimpleGeometry sphere;
-  GLuint s_vbo,s_vao,s_ibo;
+  glmlv::Image2DRGBA imgTextureSphere;
+  GLuint s_vbo,s_vao,s_ibo,textureSphere;
 
   glmlv::GLProgram shader;
+  
   GLint uMVPMatrix;
   GLint uMVMatrix;
   GLint uNormalMatrix;
-  GLint uTexture;
+  GLint uKdSampler;
+
+  GLint uDirectionalLightDir;
+  GLint uDirectionalLightIntensity;
+  GLint uPointLightPosition;
+  GLint uPointLightIntensity;
+  GLint uKd;
  
 };
