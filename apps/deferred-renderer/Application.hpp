@@ -17,6 +17,16 @@ class Application
 public:
   Application(int argc, char** argv);
 
+  enum GBufferTextureType{
+    GPosition = 0,
+    GNormal,
+    GAmbient,
+    GDiffuse,
+    GGlossyShininess,
+    GDepth, // On doit créer une texture de depth mais on écrit pas directement dedans dans le FS. OpenGL le fait pour nous (et l'utilise).
+    GBufferTextureCount
+  };
+
   int run();
   void initVboVao();
   void recupMatricesId(glmlv::GLProgram* shader);
@@ -65,4 +75,14 @@ private:
 
   glmlv::SceneData _scene;
   std::vector<GLuint> objectsTextureId;
+  //Deferred--------------------------------------------------------------
+  GLuint fPosition;
+  GLuint fNormal;
+  GLuint fAmbient;
+  GLuint fDiffuse;
+  GLuint fGlossyShininess;
+
+  GLuint _FBO;
+
+  GLuint m_GBufferTextures[GBufferTextureCount];
 };

@@ -57,6 +57,8 @@ int Application::run()
       glUniformMatrix4fv(uNormalMatrix,1,GL_FALSE,glm::value_ptr(NormalMatrix));
 
       glBindVertexArray(_vao);
+      glBindFramebuffer(GL_DRAW_FRAMEBUFFER,_FBO);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       auto indexOffset = 0;
       int shapeIdx = 0;
@@ -123,6 +125,13 @@ int Application::run()
 
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D,0);
+      glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
+
+      glBindFramebuffer(GL_READ_FRAMEBUFFER,_FBO);
+      glReadBuffer(GL_COLOR_ATTACHMENT0 + GNormal);
+      glBlitFramebuffer(0, 0, fbSize.x, fbSize.y, 0, 0, fbSize.x, fbSize.y, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+      glBindFramebuffer(GL_READ_FRAMEBUFFER,0);
 
       // GUI code:
       glmlv::imguiNewFrame();
@@ -168,6 +177,31 @@ Application::Application(int argc, char** argv):
   glEnable(GL_DEPTH_TEST);
 
   this->initVboVao();
+  //Section to new textures-----------------------------------------------------------------
+  glGenTextures(GBufferTextureCount, m_GBufferTextures);
+
+  const auto fbSize = m_GLFWHandle.framebufferSize();
+  const GLenum m_GBufferTextureFormat[GBufferTextureCount] = { GL_RGB32F, GL_RGB32F, GL_RGB32F, GL_RGB32F, GL_RGBA32F, GL_DEPTH_COMPONENT32F };
+
+  for (int32_t i = GPosition; i < GBufferTextureCount; i++){
+        glBindTexture(GL_TEXTURE_2D, m_GBufferTextures[i]);
+        glTexStorage2D(GL_TEXTURE_2D, 1, m_GBufferTextureFormat[i], fbSize.x, fbSize.y);
+  }
+  
+  glGenFramebuffers(1,&_FBO);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER,_FBO);
+  for (int32_t i = GPosition; i <= GGlossyShininess; i++){
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+i, GL_TEXTURE_2D, m_GBufferTextures[i], 0);
+  }
+  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_GBufferTextures[GDepth], 0);
+
+  GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4 };
+  glDrawBuffers(5, drawBuffers);
+  glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
+  //-----------------------------------------------------------------------------------------
+
 
   glGenTextures(1, &whiteTextureId);
         glBindTexture(GL_TEXTURE_2D, whiteTextureId);
